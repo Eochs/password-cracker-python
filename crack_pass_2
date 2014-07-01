@@ -1,0 +1,69 @@
+def crack_pass_file2(password_file, words_file, output_file):
+  users = load_passwd(password_file)
+  words = load_words(words_file, r"([A-Za-z0-9_]+)$")
+  out = open(output_file, 'w')
+
+  found = [ ]
+
+  for j, user in enumerate(users):
+    for i, word in enumerate(words):
+    
+      if check_pass(word, user["password"]):
+        out.write(user["account"] + ":" + word + "\n")
+        out.flush()
+        found.append(user)
+        break
+      
+      tr = transform_reverse(word)[1]
+      
+      if check_pass(tr, user["password"]):
+        out.write(user["account"] + ":" + tr + "\n")
+        out.flush()
+        found.append(user)
+        break
+
+  for f in found:
+    users.remove(f)
+
+  if len(users) > 0:
+  
+    for j, user in enumerate(users):
+      for i, word in enumerate(words):
+        for cap in transform_capitalize(word):
+
+            if check_pass(cap, user["password"]):
+              out.write(user["account"] + ":" + cap + "\n")
+              out.flush()
+              del users[j]
+              break
+
+            tr = transform_reverse(cap)[1]
+
+            if check_pass(tr, user["password"]):
+              out.write(user["account"] + ":" + tr + "\n")
+              out.flush()
+              del users[j]
+              break
+
+  if len(users) > 0:
+
+    for j, user in enumerate(users):
+      for i, word in enumerate(words):
+        for dig in transform_digits(word):
+
+            if check_pass(dig, user["password"]):
+              out.write(user["account"] + ":" + dig + "\n")
+              out.flush()
+              del users[j]
+              break
+
+            tr = transform_reverse(dig)[1]
+
+            if check_pass(tr, user["password"]):
+              out.write(user["account"] + ":" + tr + "\n")
+              out.flush()
+              del users[j]
+              break
+
+  out.close()
+  return
